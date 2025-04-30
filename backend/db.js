@@ -1,4 +1,4 @@
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 
 mongoose.connect("mongodb+srv://ciphersphere:oldmonklovesme@paynest-cluster.tgbabyg.mongodb.net/paynest")
     .then(() => {
@@ -31,9 +31,22 @@ const userSchema = new mongoose.Schema({
         maxLength:50
     }
 })
+const accountSchema = new mongoose.Schema({
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User',
+        required:true
+    },
+    balance:{
+        type:Number,
+        required:true
+    }
+});
 
+const Account = mongoose.model('Account',accountSchema);
 const user = mongoose.model('user',userSchema);
 
 module.exports({
     user,
+    Account
 })
