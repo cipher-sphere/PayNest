@@ -52,31 +52,6 @@ const accountSchema = new mongoose.Schema({
   }
 });
 
-// Create account automatically when user is created
-userSchema.post('save', async function(doc) {
-  try {
-    console.log("Creating account for user:", doc._id);
-    // Generate random balance between 900 and 1000
-    const randomBalance = Math.floor(Math.random() * 101) + 900;
-    
-    // First check if account already exists
-    const existingAccount = await Account.findOne({ userId: doc._id });
-    if (existingAccount) {
-      console.log("Account already exists for user:", doc._id);
-      return;
-    }
-    
-    const account = new Account({
-      userId: doc._id,
-      balance: randomBalance // Random balance between 900 and 1000
-    });
-    const savedAccount = await account.save();
-    console.log("Account created successfully with balance:", savedAccount.balance);
-  } catch (error) {
-    console.error('Error creating account:', error);
-  }
-});
-
 // Create models
 const User = mongoose.model('User', userSchema);
 const Account = mongoose.model('Account', accountSchema);
