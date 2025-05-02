@@ -13,7 +13,7 @@ function Appbar() {
     <div className="bg-white shadow p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div>
-          <h1 className="text-xl font-bold">PaymentApp</h1>
+          <h1 className="text-xl font-bold">PayNest</h1>
         </div>
         <div className="flex items-center space-x-4">
           <button 
