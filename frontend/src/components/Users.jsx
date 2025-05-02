@@ -12,7 +12,7 @@ function Users() {
       const token = localStorage.getItem("token");
       
       try {
-        const response = await axios.get("http://localhost:3000/api/v1/user/bulk", {
+        const response = await axios.get("https://paynest-backend-h1dc.onrender.com/api/v1/user/bulk", {
           headers: {
             Authorization: `Bearer ${token}`
           }

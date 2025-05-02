@@ -15,7 +15,7 @@ function SendMoney() {
       const token = localStorage.getItem("token");
       
       try {
-        const response = await axios.get(`http://localhost:3000/api/v1/user/${userId}`, {
+        const response = await axios.get(`https://paynest-backend-h1dc.onrender.com/api/v1/user/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -44,7 +44,7 @@ function SendMoney() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/account/transfer",
+        "https://paynest-backend-h1dc.onrender.com/api/v1/account/transfer",
         {
           to: userId,
           amount: Number(amount)

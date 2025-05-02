@@ -15,7 +15,7 @@ function Dashboard() {
       
       try {
         // Fetch balance
-        const balanceResponse = await axios.get("http://localhost:3000/api/v1/account/balance", {
+        const balanceResponse = await axios.get("https://paynest-backend-h1dc.onrender.com/api/v1/account/balance", {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -24,7 +24,7 @@ function Dashboard() {
         setBalance(balanceResponse.data.balance);
         
         // Fetch users
-        const usersResponse = await axios.get("http://localhost:3000/api/v1/user/bulk", {
+        const usersResponse = await axios.get("https://paynest-backend-h1dc.onrender.com/api/v1/user/bulk", {
           headers: {
             Authorization: `Bearer ${token}`
           }

@@ -13,7 +13,7 @@ function Signup() {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:3000/api/v1/user/signup', {
+      const res = await axios.post('https://paynest-backend-h1dc.onrender.com/api/v1/user/signup', {
         username,
         password,
         firstName,
