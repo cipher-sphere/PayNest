@@ -18,9 +18,10 @@ router.post("/signup", async (req, res) => {
             });
         }
         
+        // Save password as plain text
         const user = new User({
             username,
-            password,
+            password,  // storing password as plain text
             firstName,
             lastName
         });
@@ -52,44 +53,87 @@ router.post("/signup", async (req, res) => {
     }
 });
 
+// router.post("/signin", async (req, res) => {
+//   const { username, password } = req.body;
+
+//   try {
+//     const user = await User.findOne({ username });
+//     if (!user) {
+//       return res.status(401).json({
+//         message: "User not found. Please sign up first.",
+//       });
+//     }
+
+//     if (user.password !== password) {
+//       return res.status(401).json({
+//         message: "Invalid username or password",
+//       });
+//     }
+
+//     // Only check for account if signin is successful
+//     let account = await Account.findOne({ userId: user._id });
+//     if (!account) {
+//       return res.status(403).json({
+//         message: "Account not found. Please sign up first.",
+//       });
+//     }
+
+//     const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+
+//     res.json({
+//       token,
+//       userId: user._id,
+//       balance: account.balance,
+//     });
+//   } catch (error) {
+//     console.error("Signin error:", error);
+//     res.status(500).json({
+//       message: "Error signing in",
+//       error: error.message,
+//     });
+//   }
+// });
 router.post("/signin", async (req, res) => {
     const { username, password } = req.body;
-    
+  
     try {
-        const user = await User.findOne({ username, password });
-        if (!user) {
-            return res.status(401).json({
-                message: "Invalid username or password"
-            });
-        }
-        
-        // Check if user has an account, if not create one
-        let account = await Account.findOne({ userId: user._id });
-        if (!account) {
-            const randomBalance = Math.floor(Math.random() * 101) + 900;
-            account = new Account({
-                userId: user._id,
-                balance: randomBalance
-            });
-            await account.save();
-            console.log("Account created on signin with balance:", randomBalance);
-        }
-        
-        const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-        
-        res.json({
-            token,
-            userId: user._id,
-            balance: account.balance
+      const user = await User.findOne({ username });
+      if (!user) {
+        return res.status(401).json({
+          message: "User not found. Please sign up first.",
         });
+      }
+  
+      if (user.password !== password) {
+        return res.status(401).json({
+          message: "Invalid username or password",
+        });
+      }
+  
+      // Only check for account if signin is successful
+      let account = await Account.findOne({ userId: user._id });
+      if (!account) {
+        return res.status(403).json({
+          message: "Account not found. Please sign up first.",
+        });
+      }
+  
+      const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+  
+      res.json({
+        token,
+        userId: user._id,
+        balance: account.balance,
+      });
     } catch (error) {
-        console.error("Signin error:", error);
-        res.status(500).json({
-            message: "Error signing in",
-            error: error.message
-        });
+      console.error("Signin error:", error);
+      res.status(500).json({
+        message: "Error signing in",
+        error: error.message,
+      });
     }
-});
+  });
+  
 
 router.get("/me", authMiddleware, async (req, res) => {
     try {
@@ -110,39 +154,42 @@ router.get("/me", authMiddleware, async (req, res) => {
         });
     }
 });
-
-// Create account for existing users
-router.post("/create-account", authMiddleware, async (req, res) => {
-    try {
-        // Check if account already exists
-        let account = await Account.findOne({ userId: req.userId });
-        
-        if (account) {
-            return res.json({
-                message: "Account already exists",
-                balance: account.balance
-            });
-        }
-        
-        // Create new account with random balance
-        const randomBalance = Math.floor(Math.random() * 101) + 900;
-        account = new Account({
-            userId: req.userId,
-            balance: randomBalance
-        });
-        await account.save();
-        
-        res.json({
-            message: "Account created successfully",
-            balance: randomBalance
-        });
-    } catch (error) {
-        console.error("Account creation error:", error);
-        res.status(500).json({
-            message: "Error creating account",
-            error: error.message
-        });
-    }
+router.get("/bulk", authMiddleware, async (req, res) => {
+  try {
+      // Find all users except the current user and exclude password field
+      const users = await User.find({ _id: { $ne: req.userId } }).select("-password");
+      
+      res.json({
+          users
+      });
+  } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({
+          message: "Error fetching users",
+          error: error.message
+      });
+  }
 });
 
+// Add endpoint to get a specific user by ID
+router.get("/:userId", authMiddleware, async (req, res) => {
+  try {
+      const user = await User.findById(req.params.userId).select("-password");
+      if (!user) {
+          return res.status(404).json({
+              message: "User not found"
+          });
+      }
+      
+      res.json({
+          user
+      });
+  } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({
+          message: "Error fetching user details",
+          error: error.message
+      });
+  }
+});
 export default router;
